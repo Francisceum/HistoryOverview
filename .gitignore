@@ -1,0 +1,8 @@
+# PhpStorm project files
+*.ipr
+*.iws
+.idea/
+
+# Netbeans project files
+nbproject/
+nbactions.xml
