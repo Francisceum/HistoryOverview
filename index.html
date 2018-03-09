@@ -5,9 +5,33 @@
     <meta charset="utf-8">
     <title>Info windows</title>
     <link rel="stylesheet" href="main.css"/>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Permanent+Marker|Open+Sans:300,400,700" type="text/css" async="true">
+    <link rel="stylesheet" href="https://francisceum.de/dl3/vendor/bootstrap/css/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="https://francisceum.de/dl3/vendor/font-awesome/css/font-awesome.min.css" type="text/css" async="true">
+    <link rel="stylesheet" href="https://francisceum.de/dl3/css/theme.css" type="text/css">
+    <link rel="stylesheet" href="https://francisceum.de/dl3/css/skins/default.css" type="text/css">
+    <!--
+    <link rel="stylesheet" href="css/francisceum.css">
+    -->
+    <script src="/dl3/vendor/modernizr/modernizr.min.js" type="application/javascript">
+    </script>
 </head>
 <body>
-    <div id="map"></div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <div id="sidebar"></div>
+            </div>
+            <div class="col-md-9">
+                <div id="map"></div>
+            </div>
+        </div>
+    </div>
+
+    <script
+            src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
     <script src="map.js"></script>
     <script async defer
             src="https://maps.googleapis.com/maps/api/js?key= AIzaSyCuBH-Mzz3JrrxQVV3qOwaVRP9agnKs1hY &callback=initMap">
