@@ -9,3 +9,10 @@ html, body {
     margin: 0;
     padding: 0;
 }
+
+.labels {
+    color: white;
+    white-space: nowrap;
+    text-shadow: 0px 0px 5px #999;
+    font-size:1.2em;
+}

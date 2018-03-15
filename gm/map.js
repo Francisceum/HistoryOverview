@@ -1,30 +1,40 @@
 function initMap() {
-    var clicked = -1;
+    // ID des ausgewählten Gebäudes
+    var selectedId = "";
+
+    // Mittelpunkt der Karte
     var center = {
         lat: 51.9689129,
         lng: 12.0910298
     };
 
+    // Alle Gebäude
     var buildings = [
         {
+            // Angezeigter Titel
             title: "N-Gebäude",
+            // Interne ID (muss einzigartig sein)
             id: "ngeb",
+            // Position des Labels
             pos: {
-                lat: 51.968522,
-                lng: 12.091052
+                lat: 51.968575,
+                lng: 12.091002
             },
+            // Farbe des Gebäudes
+            color: "blue",
+            // HTML-Beschreibung des Gebäudes (wird in der Sidebar angezeit)
             description: '<div class="list-group">' +
             '<h1 id="firstHeading" class="firstHeading list-group-item list-group-item-active">N-Gebäude</h1>' +
             '<p class="list-group-item">Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.</p>' +
             '<a href="seite.html" class="read-more list-group-item">Mehr lesen</a> </div></div>',
+            // GeoJSON des Gebäudes, z.B. mit geojson.io erstellen
             geoJson: {
                 "type": "FeatureCollection",
                 "features": [
                     {
                         "type": "Feature",
                         "properties": {
-                            "color": "blue",
-                            "stroke-width": 2,
+                            "stroke-width": 1,
                             "stroke-opacity": 1,
                             "fill-opacity": 0.5
                         },
@@ -55,11 +65,55 @@ function initMap() {
                                 ]
                             ]
                         }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
+                            "stroke-width": 1,
+                            "stroke-opacity": 1,
+                            "fill-opacity": 0.5
+                        },
+                        "geometry": {
+                            "type": "Polygon",
+                            "coordinates": [
+                                [
+                                    [
+                                        12.090959814529419,
+                                        51.968657290340985
+                                    ],
+                                    [
+                                        12.090864246406555,
+                                        51.96858623326939
+                                    ],
+                                    [
+                                        12.091015001037598,
+                                        51.96843089881353
+                                    ],
+                                    [
+                                        12.091190251369476,
+                                        51.96849204116359
+                                    ],
+                                    [
+                                        12.090959814529419,
+                                        51.968657290340985
+                                    ]
+                                ]
+                            ]
+                        }
                     }
                 ]
             }
         }
     ];
+
+    function findBuilding(id) {
+        for (var i = 0; i < buildings.length; i++) {
+            if (buildings[i].id == id) {
+                return buildings[i];
+            }
+        }
+        return undefined;
+    }
 
     var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 19,
@@ -69,49 +123,60 @@ function initMap() {
 
     for (var i = 0; i < buildings.length; i++) {
         var building = buildings[i];
-        var info = new google.maps.InfoWindow({
-            content: "<div class='maps-info-body' id='" + building.id + "'>" + building.description + "</div>"
-
-        });
-        var marker = new google.maps.Marker({
+        // Marker für das aktuelle Gebäude
+        var marker = new MarkerWithLabel({
             position: building.pos,
             title: building.title,
-            map: map
+            labelContent: building.title,
+            labelClass: "labels label-" + building.id,
+            map: map,
+            opacity: 0
         });
 
-        for (var j = 0; i < building.geoJson.features.length; i++) {
-            building.geoJson.features[j].properties["id"] = i;
+        // IDs der GeoJSON-Features, die zum Gebäude gehoren
+        building.featureIds = [];
+        for (var j = 0; j < building.geoJson.features.length; j++) {
+            // ID und Farbe in GeoJSON einfügen
+            building.geoJson.features[j].properties["id"] = building.id;
+            building.geoJson.features[j].properties["color"] = building.color;
+            building.featureIds.push(j);
         }
         map.data.addGeoJson(building.geoJson);
 
-        map.data.getCursor = function() {
-            return "hand";
-        };
-
-        marker.setOpacity(0);
-
-        console.log(info.getContent())//.parentNode.classList.add("google-info-window");
-
-        marker.addListener('click', function () {
+        marker.addListener('click', function (event) {
+            selectedId = building.id
             $('#sidebar').html(building.description)
         });
 
-        map.data.addListener('click', function(event) {
-            clicked = event.feature.getProperty("id");
-            $('#sidebar').html(buildings[event.feature.getProperty("id")].description)
-        });
-
         map.data.addListener('mouseover', function(event){
-            $('#sidebar').html(buildings[event.feature.getProperty("id")].description)
+            $('#sidebar').html(findBuilding(building.id).description);
         });
 
         map.data.addListener('mouseout', function(event){
-            if (clicked < 0){
+            if (selectedId == ""){
                 $('#sidebar').html('');
             }
         });
-
     }
+
+    map.data.addListener('click', function(event) {
+        selectedId = event.feature.getProperty("id");
+        $('#sidebar').html(findBuilding(event.feature.getProperty("id")).description)
+    });
+
+    map.data.addListener('mouseover', function(event){
+        var building = findBuilding(event.feature.getProperty("id"));
+        $('#sidebar').html(building.description);
+        map.data.revertStyle();
+        map.data.overrideStyle(event.feature, {strokeWeight: 3});
+    });
+
+    map.data.addListener('mouseout', function(event){
+        if (selectedId == ""){
+            $('#sidebar').html('');
+        }
+        map.data.revertStyle();
+    });
 
     map.data.setStyle(function(feature) {
         var color = 'gray';
@@ -121,19 +186,8 @@ function initMap() {
         return /** @type {google.maps.Data.StyleOptions} */({
             fillColor: color,
             strokeColor: color,
-            strokeWeight: 2
+            strokeWeight: 1
         });
     });
-
-    map.data.addListener('mouseover', function(event) {
-        map.data.revertStyle();
-        map.data.overrideStyle(event.feature, {strokeWeight: 4});
-    });
-
-    map.data.addListener('mouseout', function(event) {
-        map.data.revertStyle();
-    });
-
 }
-
-$
+initMap();
