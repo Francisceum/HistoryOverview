@@ -1,3 +1,4 @@
 <?php
-        header('Location: gm/index.html');
+        header('Location: https://history-overview.herokuapp.com/gm/index.html');
+        die();
 >
