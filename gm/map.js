@@ -1,4 +1,4 @@
-function initMap() {
+function initMap(domElement) {
     // Mittelpunkt der Karte
     var center = {
         lat: 51.9689129,
@@ -111,42 +111,25 @@ function initMap() {
         }
     ];
 
-    function findBuilding(id) {
-        for (var i = 0; i < buildings.length; i++) {
-            if (buildings[i].id == id) {
-                return buildings[i];
-            }
-        }
-        return undefined;
-    }
-
-    var map = new google.maps.Map(document.getElementById('map'), {
+    var map = new google.maps.Map(domElement, {
         zoom: 19,
         mapTypeId: 'satellite',
         center: center
     });
 
     for (var i = 0; i < buildings.length; i++) {
+        // Aktuelles Gebäude
         var building = buildings[i];
-        // Marker für das aktuelle Gebäude
-        console.log(building);
-        var marker = new MarkerWithLabel({
-            position: building.pos,
-            title: building.title,
-            labelContent: building.title,
-            labelClass: "labels label-" + building.id,
-            map: map,
-            opacity: 0
-        });
 
-        // IDs der GeoJSON-Features, die zum Gebäude gehoren
-        building.featureIds = [];
+        // Marker für das aktuelle Gebäude
+        var marker = buildingMarker(building);
+
         for (var j = 0; j < building.geoJson.features.length; j++) {
             // ID und Farbe in GeoJSON einfügen
             building.geoJson.features[j].properties["id"] = building.id;
             building.geoJson.features[j].properties["color"] = building.color;
-            building.featureIds.push(j);
         }
+
         map.data.addGeoJson(building.geoJson);
 
         marker.addListener('click', function (event) {
@@ -157,11 +140,9 @@ function initMap() {
     map.data.addListener('click', function(event) {
         var building = findBuilding(event.feature.getProperty("id"));
         location.href = building.link;
-        //$('#sidebar').html(findBuilding(event.feature.getProperty("id")).description)
     });
 
     map.data.addListener('mouseover', function(event){
-        var building = findBuilding(event.feature.getProperty("id"));
         map.data.revertStyle();
         map.data.overrideStyle(event.feature, {strokeWeight: 3});
     });
@@ -181,5 +162,27 @@ function initMap() {
             strokeWeight: 1
         });
     });
+
+    // Findet das Gebäude mit der angegebenen ID
+    function findBuilding(id) {
+        for (var i = 0; i < buildings.length; i++) {
+            if (buildings[i].id == id) {
+                return buildings[i];
+            }
+        }
+        return undefined;
+    }
+
+    // Gibt einen Marker für das Gebäude zurück
+    function buildingMarker(building) {
+        return new MarkerWithLabel({
+            position: building.pos,
+            title: building.title,
+            labelContent: building.title,
+            labelClass: "labels label-" + building.id,
+            map: map,
+            opacity: 0
+        });
+    }
 }
-initMap();
+initMap(document.getElementById('map'));
