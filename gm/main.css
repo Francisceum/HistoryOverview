@@ -13,6 +13,6 @@ html, body {
 .labels {
     color: white;
     white-space: nowrap;
-    text-shadow: 0px 0px 5px #999;
+    text-shadow: 0 0 5px #999;
     font-size:1.2em;
 }
