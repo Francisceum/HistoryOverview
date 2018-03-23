@@ -21,8 +21,9 @@ function inherits(childCtor, parentCtor) {
  * @param {string} crossURL The URL of the cross image =.
  * @private
  */
-function MarkerLabel_(marker, crossURL) {
+function MarkerLabel_(marker, crossURL, properties) {
     this.marker_ = marker;
+    this.properties = properties;
 
     this.labelDiv_ = document.createElement("div");
     this.labelDiv_.style.cssText = "position: absolute; overflow: hidden;";
@@ -211,7 +212,7 @@ MarkerLabel_.prototype.addMouseListeners = function () {
             }
         }),
         google.maps.event.addDomListener(this.eventDiv_, "click", function (e) {
-            var mEvent = {latLng: me.marker_.getPosition()};
+            var mEvent = {latLng: me.marker_.getPosition(), properties: me.properties};
             if (me.marker_.getClickable() || me.marker_.getDraggable()) {
                 if (cIgnoreClick) { // Ignore the click reported when a label drag ends
                     cIgnoreClick = false;
@@ -540,7 +541,7 @@ MarkerLabel_.prototype.setVisible = function () {
  * @constructor
  * @param {MarkerWithLabelOptions} [opt_options] The optional parameters.
  */
-function MarkerWithLabel(opt_options) {
+function MarkerWithLabel(opt_options, properties) {
     opt_options = opt_options || {};
     opt_options.labelContent = opt_options.labelContent || "";
     opt_options.labelAnchor = opt_options.labelAnchor || new google.maps.Point(0, 0);
@@ -565,7 +566,7 @@ function MarkerWithLabel(opt_options) {
     opt_options.crossImage = opt_options.crossImage || "//maps.gstatic.com/intl/en_us/mapfiles/drag_cross_67_16.png";
     opt_options.optimized = false; // Optimized rendering is not supported
 
-    this.label = new MarkerLabel_(this, opt_options.crossImage); // Bind the label to the marker
+    this.label = new MarkerLabel_(this, opt_options.crossImage, properties); // Bind the label to the marker
 
     // Call the parent constructor. It calls Marker.setValues to initialize, so all
     // the new parameters are conveniently saved and can be accessed with get/set.

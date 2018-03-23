@@ -2,7 +2,7 @@ function initMap(domElement) {
     // Mittelpunkt der Karte
     var center = {
         lat: 51.9689129,
-        lng: 12.0910298
+        lng: 12.0914298
     };
 
     // Alle Gebäude
@@ -729,7 +729,7 @@ function initMap(domElement) {
         map.data.addGeoJson(building.geoJson);
 
         marker.addListener('click', function (event) {
-            location.href = building.link;
+            location.href = event.properties.link;
         });
     }
 
@@ -778,7 +778,7 @@ function initMap(domElement) {
             labelClass: "labels label-" + building.id,
             map: map,
             opacity: 0
-        });
+        }, building);
     }
 }
 initMap(document.getElementById('map'));
